@@ -1,0 +1,201 @@
+from tkinter import *
+from tkinter import ttk
+import messagebox
+
+cars = []
+win = Tk()
+win.geometry("%dx%d+%d+%d" % (900, 500, 150, 130))
+
+
+# def
+def onclickregister(e):
+    if btn_register.cget("state") == NORMAL:
+        
+        car = {"brand": txt_brand.get(), "color": txt_color.get(), "made": int(txt_made.get()),
+               "pelak": txt_pelak.get()}
+        if not exist(car):
+            register(car)
+            inserttbl(car)
+            txtclear()
+    else:
+           messagebox.showwarning("information","i find it!") 
+
+
+def register(value):
+    cars.append(value)
+
+
+def inserttbl(value):
+    tbl.insert('', "end", values=[value["brand"], value["color"], value["made"], value["pelak"]])
+
+
+def txtclear():
+    txtvar_brand.set("")
+    txtvar_made.set("")
+    txtvar_color.set("")
+    txtvar_pelak.set("")
+    txt_brand.focus_set()
+    btn_register.configure(state=DISABLED)
+
+
+def activebtn(e):
+    if txt_brand.get() != "":
+        btn_register.configure(state=NORMAL)
+    else:
+        btn_register.configure(state=DISABLED)
+def onclicksearch(e):
+    if txt_search.get()=="":
+        load_and_clear()
+    else:
+        result=search(txt_search.get())
+        cleartbl()
+        for item in result:
+            inserttbl(item)
+            
+def cleartbl():
+    for item in tbl.get_children():
+        select=str(item,)
+        tbl.delete(select)
+def load_and_clear():
+    for otem in cars:
+        inserttbl(item)
+
+
+def search(value):
+    searchlist=[]
+    for item in cars:
+        if item["brand"]==value or item["color"]==value or item["made"]==value or item["pelak"]==value:
+            searchlist.append(item)
+    return searchlist
+def cleardata(e):
+    dialog=messagebox.askyesno("Warning","are you sure?")
+    if dialog==True:
+        cleartbl()
+        cars.clear()
+def onclickdelete(e):
+    dialog=massagebox.askyesno("Warning","are you sure?")
+    if dialog==True:
+       selection = tbl.selection()
+    if selection != ():
+        item=tbl.item(selection)["values"]
+        car_remove={{"brand": item[0], "color": item[1], "made": int(item[2]),
+               "pelak": item[3]}}
+        delete(car_remove)
+        tbl.delete(selection)
+        txtclear()
+        
+def delete(value):
+    cars.remove(value)
+    
+    
+    
+    
+    
+    
+    
+def selection(e):
+    selection=tbl.selection()
+    if selection!=():
+        item=tbl.item(selection)["vaalues"]
+        txtvar_brand.set(item[0])
+        txtvar_made.set(item[1])
+        txtvar_color.set(item[2])
+        txtvar_pelak.set(item[3])
+        btn_register.configure(state=NORMAL)
+def exist(value):
+    for item in cars:
+        if item["pelak"]==value["pelak"]:
+            return True
+        
+        
+    return False
+def onclickupdate(e):
+    dialog = massagebox.askyesno("Warning", "are you sure for edit?")
+    if dialog == True:
+        selection=tbl.selection()
+        if selection!=():
+            item = tbl.item(selection)["values"]
+            car_remove = {{"brand": item[0], "color": item[1], "made": int(item[2]),
+                           "pelak": item[3]}}
+            car_new = {"brand": txt_brand.get(), "color": txt_color.get(), "made": int(txt_made.get()),
+                   "pelak": txt_pelak.get()}
+            update(car_remove,car_new)
+            tbl.item(selection,values=[car_new["brand"],car_new["color"],car_new["made"],car_new["pelak"]])
+            txtclear()
+def update(value_rem,value_new):
+    index=cars.index(value_rem)
+    cars[index]=value_new
+        
+       
+
+
+
+
+
+txtvar_brand = StringVar()
+txtvar_color = StringVar()
+txtvar_made = StringVar()
+txtvar_pelak = StringVar()
+# txt
+txt_brand = Entry(win, justify="center", txtvariable=txtvar_brand)
+txt_brand.bind("<KeyRelease>", activebtn)
+txt_brand.place(x=100, y=80)
+txt_color = Entry(win, justify="center", txtvariable=txtvar_color)
+
+txt_color.place(x=100, y=120)
+txt_made = Entry(win, justify="center", txtvariable=txtvar_made)
+
+txt_made.place(x=100, y=160)
+txt_pelak = Entry(win, justify="center", txtvariable=txtvar_pelak)
+
+txt_pelak.place(x=100, y=200)
+txtvar_search=StringVar()
+txtvar_search = StringVar()
+txt_search = Entry(win, justify="center", txtvariable=txtvar_search,width=25,font=10)
+
+txt_search.place(x=570, y=30)
+# lbl
+lbl_brand = Label(win, text="brand")
+lbl_brand.place(x=50, y=80)
+lbl_color = Label(win, text="color")
+lbl_color.place(x=50, y=120)
+lbl_made = Label(win, text="made")
+lbl_made.place(x=50, y=160)
+lbl_pelak = Label(win, text="pelak")
+lbl_pelak.place(x=50, y=200)
+# btn
+btn_register=Button(win, text="Register", width=15)
+btn_register.configure(state=DISABLED)
+btn_register.bind("<Button-1>", onclickregister)
+btn_register.place(x=105, y=250)
+btn_search=Button(win, text="Search", width=15)
+
+btn_search.bind("<Button-1>", onclicksearch)
+btn_search.place(x=640, y=30)
+btn_cleardata=Button(win, text="Clear All Data", width=15)
+
+btn_cleardata.bind("<Button-1>", cleardata)
+btn_cleardata.place(x=640, y=320)
+btn_delete=Button(win, text="Delete", width=15)
+
+btn_delete.bind("<Button-1>", onclickdelete)
+btn_delete.place(x=350, y=320)
+btn_update=Button(win, text="Update", width=15)
+
+btn_update.bind("<Button-1>", onclickupdate)
+btn_update.place(x=105, y=300)
+
+# tbl
+tuplec = "c1", "c2", "c3", "c4"
+tbl = ttk.Treeview(win, column=tuplec, show="headings")
+tbl.column(tuplec[0], width=100)
+tbl.heading(tuplec[0], text="Brand")
+tbl.column(tuplec[1], width=100)
+tbl.heading(tuplec[1], text="Color")
+tbl.column(tuplec[2], width=100)
+tbl.heading(tuplec[2], text="Made")
+tbl.column(tuplec[3], width=100)
+tbl.heading(tuplec[3], text="Pelak")
+tbl.bind("<Button-1>",selection)
+tbl.place(x=350, y=80)
+win.mainloop()
